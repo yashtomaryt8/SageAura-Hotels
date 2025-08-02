@@ -38,7 +38,7 @@ const clerkWebhooks = async (req, res) => {
             }
 
             case 'user.updated':{
-                await User.findByIdAndUpdate(data.id, userData)
+                await User.findByIdAndUpdate(data.id, userData, { new: true, upsert: true})
                 break;
             }
             case 'user.deleted':{
@@ -49,11 +49,12 @@ const clerkWebhooks = async (req, res) => {
                 break;
             }
         }
-        res.json({ success: true ,message: 'Webhook processed successfully' });
+        res.status(200).json({ success: true, message: 'Webhook processed successfully' });
+
     }
     catch (error) {
-        console.error('Error processing Clerk webhook:', error.message);
-        res.json({ success: false, message: 'Failed to process webhook' });
+        console.error('Error processing Clerk webhook:', error);
+        res.status(400).json({ success: false, message: 'Failed to process webhook' });
     }
 }
 
