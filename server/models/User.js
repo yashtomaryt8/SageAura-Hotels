@@ -4,7 +4,6 @@ const userSchema = new mongoose.Schema({
     _id: {
         type: String,
         required: true,
-        unique: true // ✅ Prevent duplicate Clerk IDs
     },
     username: {
         type: String,
@@ -13,7 +12,7 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true // ✅ Avoid duplicate emails
+        unique: true 
     },
     image: {
         type: String,
@@ -26,7 +25,7 @@ const userSchema = new mongoose.Schema({
     },
     recentSearchedCities: {
         type: [String],
-        default: [] // ✅ prevents validation error
+        default: []
     },
 }, {
     timestamps: true
