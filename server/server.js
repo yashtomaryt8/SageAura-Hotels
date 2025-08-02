@@ -1,28 +1,25 @@
-import express from "express"
-import "dotenv/config"
-import cors from "cors"
-import bodyParser from 'body-parser'
+export const config = {
+  api: {
+    bodyParser: false, // ✅ Required for Clerk webhooks on Vercel
+  },
+};
+
+import express from "express";
+import "dotenv/config";
+import cors from "cors";
 import connectDB from "./configs/db.js";
-import { clerkMiddleware } from '@clerk/express'
 import clerkWebhooks from "./controllers/clerkWebhooks.js";
 
+connectDB();
 
-connectDB() // Connect to MongoDB
+const app = express();
+app.use(cors()); // ✅ Allow cross-origin requests
 
-const app = express()
-app.use(cors()) // Enable Cross-Origin Resource Sharing
+// ✅ Webhook Route
+app.post("/api/clerk", clerkWebhooks);
 
-// Middleware
-// app.use(express.json()) // Parse JSON bodies
-// app.use(clerkMiddleware())
+app.use(express.json());
+app.get("/", (req, res) => res.send("API is Working"));
 
-// API to listen Clerk webhooks
-app.post('/api/clerk', bodyParser.raw({ type: '*/*' }), clerkWebhooks);
-
-app.get('/', (req, res)=> res.send("API is Working"))
-
-const PORT = process.env.PORT || 3000
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`)
-})
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
