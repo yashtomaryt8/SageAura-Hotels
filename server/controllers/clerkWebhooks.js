@@ -48,3 +48,5 @@ const clerkWebhooks = async (req, res)=> {
         res.json()
     }
 }
+
+export default clerkWebhooks
