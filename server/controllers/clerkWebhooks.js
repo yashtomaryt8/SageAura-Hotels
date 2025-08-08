@@ -1,54 +1,52 @@
-// clerkWebhooks.js
-import dotenv from "dotenv";
-dotenv.config();
-import { Webhook } from "svix";
-import User from "../models/User.js"; // Your Mongoose User model
+import User from '../models/User.js'
+import { Webhook } from 'svix';
 
-export const clerkWebhooks = async (req, res) => {
-  try {
-    let evt;
-
-    // If in development mode, skip Svix signature verification
-    // if (process.env.LOCAL_TEST === "true") {
-    //   console.log("⚠️ Dev mode: Skipping Svix signature verification");
-    //   evt = req.body; // Trust the payload directly
-    // } else {
-      // ✅ Create Svix instance with Clerk webhook secret
-      const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
-
-      // ✅ Collect headers for verification
-      const headers = {
-        "svix-id": req.headers["svix-id"],
-        "svix-timestamp": req.headers["svix-timestamp"],
-        "svix-signature": req.headers["svix-signature"],
-      };
-
-      // ✅ Verify payload (throws error if signature invalid)
-      const payloadString = JSON.stringify(req.body);
-      evt = wh.verify(payloadString, headers);
-      console.log("✅ Clerk Webhook Event Verified:", evt);
-    // }
-
-    // ✅ Example: Save user on `user.created`
-    if (evt.type === "user.created") {
-      const { id, email_addresses, first_name, last_name, image_url } = evt.data;
-
-      await User.create({
-        clerkId: id,
-        email: email_addresses[0]?.email_address,
-        firstName: first_name,
-        lastName: last_name,
-        imageUrl: image_url,
-      });
-
-      console.log("✅ User stored in MongoDB");
+const clerkWebhooks = async (req, res)=> {
+    try{
+        // Create Svix Instance with clerk webhook secret
+        const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET)
+        
+        // Getting Headers
+        const headers = {
+      "svix-id": req.headers["svix-id"],
+      "svix-timestamp": req.headers["svix-timestamp"],
+      "svix-signature": req.headers["svix-signature"],
     }
 
-    res.status(200).json({ success: true });
-  } catch (err) {
-    console.error("❌ Webhook Error:", err.message);
-    res.status(400).json({ error: err.message });
-  }
-};
+    //Verifying 
+    await whook.verify(JSON.stringify(req.body), headers)
 
-export default clerkWebhooks;
+    // Getting Data from request body
+
+    const {data, type} = req.body
+
+    const userData = {
+        _id: data.id,
+        email: data.email_addresses?.[0]?.email_address || "theflash.tfbro@gmail.com",
+        username: `${(data.first_name ?? "")} ${(data.last_name ?? "")}`.trim() || "No Name",
+        image: data.image_url || "",
+    }
+
+    switch (type) {
+      case "user.created":{
+        await User.create(userData)
+        break}
+      case "user.updated":{
+        await User.findByIdAndUpdate(data.id, userData, { new: true, upsert: true })
+        break}
+      case "user.deleted":{
+        await User.findByIdAndDelete(data.id)
+        break}
+      default:
+        console.log(" Unhandled event type:", type);
+    }
+    res.json({success: true, message: "Webhook Received"})
+
+    }
+    catch(error){
+        console.log(error.message)
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+export default clerkWebhooks
