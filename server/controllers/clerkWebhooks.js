@@ -21,10 +21,10 @@ const clerkWebhooks = async (req, res)=> {
     const {data, type} = req.body
 
     const userData = {
-        _id: data.id,
-        email: data.email_addresses?.[0]?.email_address || "theflash.tfbro@gmail.com",
-        username: `${(data.first_name ?? "")} ${(data.last_name ?? "")}`.trim() || "No Name",
-        image: data.image_url || "",
+        _id: data._id,
+        email: data.email_addresses[0].email_address,
+        username: data.first_name + " " + data.last_name,
+        image: data.image_url
     }
 
     switch (type) {
@@ -43,11 +43,10 @@ const clerkWebhooks = async (req, res)=> {
     res.json({success: true, message: "Webhook Received"})
 
     }
-     catch(error){
+    catch(error){
         console.log(error.message)
-        res.status(500).json({ success: false, message: error.message });
+        res.json()
     }
-    
 }
 
-export default clerkWebhooks
+export default clerkWebhooks 
