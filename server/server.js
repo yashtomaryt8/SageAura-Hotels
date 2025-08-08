@@ -1,29 +1,19 @@
+// server.js
 import express from "express";
-import "dotenv/config";
-import cors from "cors";
+import dotenv from "dotenv";
+import { clerkWebhooks } from "./controllers/clerkWebhooks.js";
 import connectDB from "./configs/db.js";
-import { clerkMiddleware } from "@clerk/express";
-import bodyParser from "body-parser";
-import clerkWebhooks from "./controllers/clerkWebhooks.js";
 
-// Connect to MongoDB
+dotenv.config();
+const app = express();
+
 connectDB();
 
-const app = express();
-app.use(cors());
+// ✅ Webhook route — must be raw parser
+app.post("/api/clerk", express.raw({ type: "application/json" }), clerkWebhooks);
 
-// Clerk middleware for other routes (not for webhook raw parsing)
-app.use(clerkMiddleware());
-
-// Webhook route - RAW body parser is used here only
-app.post(
-  "/api/clerk",
-  bodyParser.raw({ type: "application/json" }), // ⬅ raw body for signature verification
-  clerkWebhooks
-);
-
-// Simple test route
-app.get("/", (req, res) => res.send("API is Working"));
+// ✅ Other routes use JSON parser
+app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
