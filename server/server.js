@@ -15,5 +15,7 @@ app.post("/api/clerk", express.raw({ type: "application/json" }), clerkWebhooks)
 // ✅ Other routes use JSON parser
 app.use(express.json());
 
+app.get("/", (req, res) => res.send("API is Working"));
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
