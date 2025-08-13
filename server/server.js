@@ -23,11 +23,12 @@ app.use(clerkMiddleware())
 //API
 app.use('/api/clerk', clerkWebhooks)
 
-app.get("/", (req, res) => res.send("API is Working"));
-app.get('/api/user', userRouter)
-app.get('/api/hotels', hotelRouter)
-app.get('/api/rooms', roomRouter)
-app.get('/api/bookings', bookingRouter)
+app.use('/api/user', userRouter)
+app.use('/api/hotels', hotelRouter)
+app.use('/api/rooms', roomRouter)
+app.use('/api/bookings', bookingRouter)
+
+app.use("/", (req, res) => res.send("API is Working"));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
