@@ -1,23 +1,30 @@
-import User from '../models/User.js';
+import { clerkClient } from "@clerk/clerk-sdk-node";
+import User from "../models/User.js";
 
 export const protect = async (req, res, next) => {
   try {
-    const { userId } = req.auth(); // call it
-    // console.log('Auth object:', req.auth());
+    const { userId } = req.auth();
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
-    if (!userId) {
-      return res.status(401).json({ success: false, message: 'Not authenticated' });
-    }
+    let user = await User.findById(userId);
 
-    const user = await User.findById(userId); // _id = Clerk userId
     if (!user) {
-      return res.status(401).json({ success: false, message: 'User not found' });
+      const clerkUser = await clerkClient.users.getUser(userId);
+
+      user = new User({
+        _id: clerkUser.id, // matches your schema
+        username: clerkUser.username || clerkUser.firstName || "Guest",
+        image: clerkUser.imageUrl, // Clerk profile image
+        email: clerkUser.emailAddresses[0]?.emailAddress
+      });
+
+      await user.save();
     }
 
     req.user = user;
     next();
   } catch (error) {
-    console.error('Protect middleware error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error("ensureUserInDB error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
