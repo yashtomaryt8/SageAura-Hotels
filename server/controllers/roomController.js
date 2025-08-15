@@ -1,5 +1,5 @@
 import Hotel from '../models/Hotel.js'
-import { v2 as Cloudinary } from 'cloudinary'
+import {cloudinary} from '../configs/cloudinary.js'
 import Room from '../models/Room.js'
 
 // API to create a new room for a hotel
