@@ -1,3 +1,5 @@
+import dotenv from 'dotenv'
+dotenv.config()
 import { v2 as cloudinary } from 'cloudinary'
 
 const connectCloudinary = async () => {
@@ -8,4 +10,4 @@ const connectCloudinary = async () => {
     })
 }
 
-export default connectCloudinary
+export {connectCloudinary, cloudinary}
