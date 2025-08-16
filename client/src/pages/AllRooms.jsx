@@ -36,9 +36,9 @@ const AllRooms = () => {
     const [selectedSort, setSelectedSort] = useState('')
 
     const roomTypes = [
-        'Single Room',
-        'Double Room',
-        'Luxury Room',
+        'Single Bed',
+        'Double Bed',
+        'Luxury Bed',
         'Family Suite',
     ]
 
@@ -172,7 +172,7 @@ const AllRooms = () => {
         <p className='text-base font-medium text-gray-800'>FILTERS</p>
         <div className='text-xs cursor-pointer'>
           <span onClick={()=> setOpenFilters(!openFilters)} className='lg:hidden'>{openFilters ? 'HIDE' : 'SHOW'}</span>
-          <span className='hidden lg:block'>CLEAR</span>
+          <span onClick={clearFilters} className='hidden lg:block'>CLEAR</span>
         </div>
       </div>
 
