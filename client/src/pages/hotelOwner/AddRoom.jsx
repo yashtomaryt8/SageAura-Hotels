@@ -19,15 +19,11 @@ const AddRoom = () => {
         roomType: '',
         pricePerNight: 0,
         amenities: {
-            'Free Wi-Fi': false,
-            'Breakfast Included': false,
-            'Air Conditioning': false,
-            'Swimming Pool': false,
-            'Gym Access': false,
-            'Parking': false,
-            'Pet Friendly': false,
+            'Free WiFi': false,
+            'Free Breakfast': false,
+            'Pool Access': false,
             'Room Service': false,
-            'Laundry Service': false,
+            'Mountain View': false,
         }
     });
 
