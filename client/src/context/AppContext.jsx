@@ -24,7 +24,7 @@ export const AppProvider = ({ children }) => {
       const {data} = await axios.get('/api/rooms')
       if(data.success){
         setRooms(data.rooms)
-        console.log("Rooms fetched:", data)
+        
       }
       else{
         toast.error(data.message)
@@ -45,8 +45,6 @@ export const AppProvider = ({ children }) => {
         return;
       }
 
-      console.log("Token fetched:", token);
-
       const { data } = await axios.get("/api/user", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -54,6 +52,7 @@ export const AppProvider = ({ children }) => {
       if (data.success) {
         setIsOwner(data.role === "hotelOwner");
         setsearchedCities(data.recentSearchedCities);
+        
       } else {
         console.warn("User data not ready, retrying in 5 seconds...");
         setTimeout(fetchUser, 5000);
