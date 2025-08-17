@@ -1,16 +1,15 @@
 import Booking from './../models/Booking.js';
 import Room from '../models/Room.js';
 import Hotel from '../models/Hotel.js';
+import transporter from './../configs/nodemailer.js';
 
 // Function to Check Availability of Room
 const checkAvailability = async ({ checkInDate, checkOutDate, room }) => {
     try {
         const bookings = await Booking.find({
             room,
-            // Overlap condition
-            $or: [
-                { checkInDate: { $lt: checkOutDate }, checkOutDate: { $gt: checkInDate } }
-            ]
+            checkInDate: {$lte: checkOutDate},
+            checkOutDate: {$gte: checkInDate }
         });
 
         const isAvailable = bookings.length === 0;
@@ -71,8 +70,31 @@ export const createBooking = async (req, res) => {
             totalPrice,
         });
 
+        const mailOptions = {
+            from: process.env.SENDER_EMAIL,
+            to: req.user.email,
+            subject: 'Hotel Booking Details',
+            html: `
+                <h2>Your Booking Details</h2>
+                <p>Dear ${req.user.username},</p>
+                <p>Thank you for your booking! Here are your details:</p>
+                <ul>
+                    <li><strong>Booking ID:</strong> ${booking._id}</li>
+                    <li><strong>Hotel Name:</strong> ${roomData.hotel.name}</li>
+                    <li><strong>Location:</strong> ${roomData.hotel.address}</li>
+                    <li><strong>Date:</strong> ${booking.checkInDate.toDateString()}</li>
+                    <li><strong>Booking Amount:</strong> ${process.env.CURRENCY || '$'} ${booking.totalPrice} /night</li>
+                </ul>
+                <p>We look forward to welcoming you!</p>
+                <p>If you need to make any changes, feel free to contact us.</p>
+            `
+        }
+
+        await transporter.sendMail(mailOptions)
+
         res.json({ success: true, message: "Booking Created Successfully", booking });
     } catch (error) {
+        console.error("Booking creation error:", error);
         res.json({ success: false, message: "Failed to create booking" });
     }
 };
@@ -80,12 +102,16 @@ export const createBooking = async (req, res) => {
 // API to get all bookings for a user
 export const getUserBookings = async (req, res) => {
     try {
-        const user = req.user._id;
+        //  console.log("REQ.USER:", req.user); // check if this prints
+        const user = req.user._id
+    // console.log("Fetching bookings for user:", user);
+
         const bookings = await Booking.find({ user })
             .populate('room hotel')
             .sort({ createdAt: -1 });
         res.json({ success: true, bookings });
     } catch (error) {
+        console.log("Error ", error)
         res.json({ success: false, message: "Failed to fetch bookings" });
     }
 };
@@ -93,7 +119,7 @@ export const getUserBookings = async (req, res) => {
 // API to get all bookings for a hotel
 export const getHotelBookings = async (req, res) => {
     try {
-        const hotel = await Hotel.findOne({ owner: req.user._id }); // fixed here
+        const hotel = await Hotel.findOne({ owner: req.user.userId }); // fixed here
         if (!hotel) {
             return res.json({ success: false, message: "No Hotel found" });
         }

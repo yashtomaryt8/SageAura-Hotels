@@ -22,10 +22,13 @@ const RoomDetails = () => {
     const checkAvailability = async ()=>{
         try{
             // Check if CheckInDate is greater than CheckOutDate
-            if(checkInDate >= checkOutDate){
-                toast.error('CheckInDate should be less than CheckOutDate')
-                return
+            if (new Date(checkInDate) >= new Date(checkOutDate)) {
+                toast.error('Check-in must be before check-out');
+                return;
             }
+
+           
+
             const {data} = await axios.post('/api/bookings/check-availability', {room: id, checkInDate, checkOutDate})
             if(data.success){
                 if(data.isAvailable){
@@ -54,11 +57,23 @@ const RoomDetails = () => {
                 return checkAvailability()
             }
             else{
-                const { data } = await axios.post('./api/bookings/book', {room: id, checkInDate, checkOutDate, guests, paymentMethod: "Pay At Hotel"}, {headers: { Authorization: `Bearer ${await getToken()}`}})
+
+                 console.log("Booking payload:", {
+                    room: id,
+                    checkInDate,
+                    checkOutDate,
+                    guests,
+                    paymentMethod: "Pay At Hotel"
+                    });
+
+                const { data } = await axios.post('/api/bookings/book', {room: id, checkInDate, checkOutDate, guests, paymentMethod: "Pay At Hotel"}, {headers: { Authorization: `Bearer ${await getToken()}`}})
+                
+                console.log("Booking response:", data);
+                
                 if(data.success){
                     toast.success(data.message)
                     navigate('/my-bookings')
-                    scrollTo(0, 0)
+                    window.scrollTo(0, 0)
                 }else{
                     toast.error(data.message )
                 }

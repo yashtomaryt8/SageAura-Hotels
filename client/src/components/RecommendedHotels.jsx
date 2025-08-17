@@ -17,8 +17,6 @@ const RecommendedHotels = () => {
   }
 
   useEffect(()=>{
-     console.log("🔍 rooms from DB:", rooms)
-  console.log("🔍 searchedCities from Context:", searchedCities)
 
     filterHotels()
   }, [rooms, searchedCities])
