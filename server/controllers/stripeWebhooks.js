@@ -1,6 +1,5 @@
 import stripe from 'stripe'
-import Booking from './../models/Booking';
-import { js } from '@eslint/js';
+import Booking from './../models/Booking.js';
 
 // API to handle Stripe Webhooks
 
