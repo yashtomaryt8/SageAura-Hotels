@@ -10,7 +10,7 @@ const MyBookings = () => {
 
   const fetchUserBookings = async () => {
     try {
-      console.log("Fetching bookings for user:", user?.id);
+      // console.log("Fetching bookings for user:", user?.id);
       const { data } = await axios.get('/api/bookings/user', {
         headers: { Authorization: `Bearer ${await getToken()}` }
       });
@@ -43,7 +43,7 @@ const MyBookings = () => {
 
 
   useEffect(() => {
-    console.log("User in context:", user);
+    // console.log("User in context:", user);
     if (user) {
       fetchUserBookings();
     }
