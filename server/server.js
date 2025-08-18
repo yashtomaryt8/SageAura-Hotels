@@ -15,7 +15,25 @@ connectDB()
 connectCloudinary()
 
 const app = express();
-app.use(cors()); // Enable Cross-Origin Resource Sharing
+
+// Enable Cross-Origin Resource Sharing
+const allowedOrigins = [
+  "http://localhost:5173",             // local dev
+  "https://sageaurahotels.vercel.app"  // production
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true, // allow cookies, auth headers, etc.
+}));
 
 // API to listen to Stripe Webhooks
 app.post('/api/stripe', express.raw({type: 'application/json'}), stripeWebhooks)
