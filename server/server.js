@@ -18,6 +18,7 @@ const app = express();
 // Enable Cross-Origin Resource Sharing
 const allowedOrigins = [
   "https://sageaurahotels.vercel.app",  // your frontend
+  "https://sage-aura-hotels.vercel.app",
   "http://localhost:5173"              // local dev
 ];
 
