@@ -9,28 +9,16 @@ import hotelRouter from './routes/hotelRoutes.js';
 import {connectCloudinary} from './configs/cloudinary.js';
 import roomRouter from './routes/roomRoutes.js'
 import bookingRouter from './routes/bookingRoutes.js'
-import { stripeWebhooks } from './controllers/stripeWebhooks.js';
+// import { stripeWebhooks } from './controllers/stripeWebhooks.js';
 
 connectDB()
 connectCloudinary()
 
 const app = express();
-// Enable Cross-Origin Resource Sharing
-const allowedOrigins = [
-  "https://sageaurahotels.vercel.app",  // your frontend
-  "https://sage-aura-hotels.vercel.app",
-  "http://localhost:5173"              // local dev
-];
+app.use(cors()); // Enable Cross-Origin Resource Sharing
 
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,  // allow cookies/headers if needed
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
-
-// API to listen to Stripe Webhooks
-app.post('/api/stripe', express.raw({type: 'application/json'}), stripeWebhooks)
+// ✅ Stripe webhook must come BEFORE express.json() 
+// app.post("/api/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
 
 // Middleware
 app.use(express.json())
