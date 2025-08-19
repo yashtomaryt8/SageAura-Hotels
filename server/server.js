@@ -15,7 +15,11 @@ connectDB()
 connectCloudinary()
 
 const app = express();
-app.use(cors()); // Enable Cross-Origin Resource Sharing
+// Allow only your frontend origin
+app.use(cors({
+  origin: "https://sage-aura-hotels-sigma.vercel.app",
+  credentials: true
+}));
 
 // ✅ Stripe webhook must come BEFORE express.json() 
 // app.post("/api/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
